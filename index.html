@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0d0f14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Saco Tracker — Rutinas y Técnica</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #161a23;
+      --surface-2: #1e2430;
+      --border: #2a3140;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #ef4444;
+      --accent-soft: rgba(239, 68, 68, 0.14);
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.15);
+      --blue: #3b82f6;
+      --amber: #f59e0b;
+      --purple: #a855f7;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding-bottom: 88px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(13, 15, 20, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px 12px;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stats-pill {
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--surface-2);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      width: 0%;
+      transition: width 0.25s ease;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px 4px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .search-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .icon-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .icon-btn:active { transform: scale(0.97); }
+
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      transition: border-color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .card.done {
+      border-color: rgba(34, 197, 94, 0.45);
+      background: linear-gradient(180deg, rgba(34, 197, 94, 0.06), var(--surface));
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    .badge-num { background: var(--surface-2); color: var(--muted); }
+    .badge-dur { background: rgba(59, 130, 246, 0.16); color: #93c5fd; }
+    .badge-boxeo { background: rgba(239, 68, 68, 0.16); color: #fca5a5; }
+    .badge-kick { background: rgba(245, 158, 11, 0.16); color: #fcd34d; }
+    .badge-muay { background: rgba(168, 85, 247, 0.16); color: #d8b4fe; }
+    .badge-tut { background: rgba(34, 197, 94, 0.16); color: #86efac; }
+
+    .check-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .check-btn.checked {
+      background: var(--green-soft);
+      border-color: var(--green);
+      color: #86efac;
+    }
+
+    .check-btn:active { transform: scale(0.95); }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      color: var(--text);
+    }
+
+    .card-focus {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin: 0 0 12px;
+    }
+
+    .card-focus strong {
+      color: #d1d5db;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .yt-btn {
+      flex: 1;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      background: #dc2626;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+    }
+    .yt-btn.search-mode {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .yt-btn:active { opacity: 0.88; }
+
+    .del-custom-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: #fca5a5;
+      border-radius: 12px;
+      padding: 0 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .note-box {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .note-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+    .note-saved {
+      color: var(--green);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      font-weight: 600;
+    }
+    .note-saved.show { opacity: 1; }
+
+    textarea.note-input {
+      width: 100%;
+      min-height: 58px;
+      resize: vertical;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      padding: 9px 11px;
+      outline: none;
+    }
+    textarea.note-input:focus {
+      border-color: var(--blue);
+    }
+
+    .fab {
+      position: fixed;
+      right: 18px;
+      bottom: 20px;
+      z-index: 30;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .fab:active { transform: scale(0.96); }
+
+    dialog {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: min(92vw, 460px);
+      padding: 18px;
+    }
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-title {
+      margin: 0 0 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .form-group input, .form-group select {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 0.92rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .btn-secondary {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 36px 16px;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>🥊 Saco Tracker</h1>
+      <span class="stats-pill" id="statsPill">0 / 0 hechos</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="all">Todos</button>
+      <button class="filter-btn" data-filter="pending">Pendientes</button>
+      <button class="filter-btn" data-filter="done">Hechos ✓</button>
+      <button class="filter-btn" data-filter="Boxeo">Boxeo</button>
+      <button class="filter-btn" data-filter="Kickboxing">Kickboxing</button>
+      <button class="filter-btn" data-filter="Muay Thai">Muay Thai</button>
+      <button class="filter-btn" data-filter="Tutorial">Tutoriales</button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <input type="search" id="searchInput" class="search-input" placeholder="Buscar rutina, duración o golpe..." />
+    <button class="icon-btn" id="resetChecksBtn" title="Desmarcar todos los checks">↺ Limpiar checks</button>
+  </div>
+
+  <main id="list"></main>
+
+  <button class="fab" id="addBtn">+ Agregar video</button>
+
+  <dialog id="addModal">
+    <form id="addForm" method="dialog">
+      <h2 class="modal-title">Agregar video a tu lista</h2>
+      <div class="form-group">
+        <label for="fTitle">Nombre / Rutina</label>
+        <input id="fTitle" required placeholder="Ej: 30 min Heavy Bag Muay Thai" />
+      </div>
+      <div class="form-group">
+        <label for="fType">Tipo</label>
+        <select id="fType">
+          <option value="Boxeo (Saco)">Boxeo (Saco)</option>
+          <option value="Kickboxing (Saco)">Kickboxing (Saco)</option>
+          <option value="Muay Thai (Saco)">Muay Thai (Saco)</option>
+          <option value="Tutorial / Técnica">Tutorial / Técnica</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fDur">Duración</label>
+        <input id="fDur" required placeholder="Ej: 30 min" />
+      </div>
+      <div class="form-group">
+        <label for="fUrl">Link de YouTube</label>
+        <input id="fUrl" type="url" required placeholder="https://www.youtube.com/watch?v=..." />
+      </div>
+      <div class="form-group">
+        <label for="fDesc">Enfoque (opcional)</label>
+        <input id="fDesc" placeholder="Ej: Low kicks y combinaciones 1-2-3" />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="cancelModal">Cancelar</button>
+        <button type="submit" class="btn-primary">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const INITIAL_VIDEOS = [
+      {
+        id: "v1",
+        num: 1,
+        duration: "30 min",
+        type: "Boxeo (Saco)",
+        title: "7 rounds con combinaciones, velocidad, golpes de potencia y desplazamientos",
+        focus: "Ideal para asimilar la mecánica básica del Jab, Directo y los desplazamientos frontales sin sobrecarga.",
+        url: "https://www.youtube.com/watch?v=kbgkeTTSau8"
+      },
+      {
+        id: "v2",
+        num: 2,
+        duration: "33 min",
+        type: "Boxeo (Saco)",
+        title: "Trabajo de velocidad y resistencia, defensa, combinaciones y acondicionamiento",
+        focus: "Excelente para practicar la recuperación de guardia tras cada golpe recto y evitar bajar las manos.",
+        url: "https://www.youtube.com/watch?v=u3eIEw5p9u8"
+      },
+      {
+        id: "v3",
+        num: 3,
+        duration: "33 min",
+        type: "Boxeo (Saco)",
+        title: "5 rounds principales con series HIIT de combinaciones y desafío final",
+        focus: "Permite sincronizar el ritmo de respiración al golpear y conectar ganchos cortos con seguridad.",
+        url: "https://www.youtube.com/watch?v=WbX95GBHImw"
+      },
+      {
+        id: "v4",
+        num: 4,
+        duration: "30+ min",
+        type: "Boxeo (Saco)",
+        title: "8 rounds con combinaciones, potencia, velocidad y resistencia (Más exigente)",
+        focus: "Enfoque de base para marcar distancia antes de acelerar la frecuencia de golpes.",
+        url: "https://www.youtube.com/watch?v=PmXE5ylNRTM"
+      },
+      {
+        id: "v5",
+        num: 5,
+        duration: "30 min",
+        type: "Boxeo (Saco)",
+        title: "Combinaciones fluidas, golpes a cabeza y cuerpo, desplazamientos y cambios de ritmo",
+        focus: "Trabajo enfocado en diferenciar la altura de los impactos (cabeza/cuerpo) manteniendo la postura.",
+        url: "https://www.youtube.com/watch?v=m-c9Tmqedlk"
+      },
+      {
+        id: "v6",
+        num: 6,
+        duration: "30 min",
+        type: "Kickboxing (Saco)",
+        title: "Kickboxing con saco, combinaciones de puños y patadas por intervalos",
+        focus: "Introduce las patadas frontales y circulares básicas con apoyo seguro sobre el pie de pivote.",
+        url: "https://www.youtube.com/watch?v=h_J9n0XrwKA"
+      },
+      {
+        id: "v7",
+        num: 7,
+        duration: "30 min",
+        type: "Muay Thai (Saco)",
+        title: "5 rounds de 3 minutos: patadas al cuerpo, combinaciones y técnica",
+        focus: "Enseña la rotación de cadera esencial para conectar patadas bajas y medias sin lesionar la rodilla.",
+        url: "https://www.youtube.com/watch?v=4oROYr3FDlQ"
+      },
+      {
+        id: "v8",
+        num: 8,
+        duration: "32 min",
+        type: "Kickboxing / Muay Thai",
+        title: "Construcción progresiva: puños, hooks, golpes al cuerpo y patadas bajas",
+        focus: "Excelente progresión paso a paso, integrando ganchos (hooks) lentos antes de aplicar fuerza.",
+        url: "https://www.youtube.com/watch?v=GQEFa8HnOmM"
+      },
+      {
+        id: "v9",
+        num: 9,
+        duration: "32:22",
+        type: "Muay Thai (Saco)",
+        title: "Combinaciones explosivas, defensa, desplazamientos y contragolpes",
+        focus: "Ayuda a fijar los fundamentos defensivos (esquivas simples y bloqueos) tras lanzar combinaciones.",
+        url: "https://www.youtube.com/watch?v=eZCdFbRE5vU"
+      },
+      {
+        id: "v10",
+        num: 10,
+        duration: "43:35",
+        type: "Muay Thai (Saco)",
+        title: "Entrenamiento largo: potencia, teeps y acondicionamiento",
+        focus: "Enfoque estricto en la extensión de la pierna para el teep (empuje frontal) manteniendo el equilibrio.",
+        url: "",
+        searchQuery: "43 minute muay thai heavy bag workout teeps conditioning"
+      },
+      {
+        id: "v11",
+        num: 11,
+        duration: "34:13",
+        type: "Muay Thai (Saco)",
+        title: "Codos, rodillas y fundamentos de Muay Thai para variar el golpeo",
+        focus: "Ideal para principiantes que buscan aprender la trayectoria vertical de las rodillas al saco.",
+        url: "",
+        searchQuery: "34 minute muay thai heavy bag workout elbows knees"
+      },
+      {
+        id: "v12",
+        num: 12,
+        duration: "72 min",
+        type: "Muay Thai (Saco)",
+        title: "Sesión completa con calentamiento (saco desde min 8:32) y movilidad final",
+        focus: "Permite asentar los fundamentos articulares y la postura de combate relajada antes de golpear.",
+        url: "https://www.youtube.com/watch?v=h_J9n0XrwKA"
+      },
+      {
+        id: "v13",
+        num: 13,
+        duration: "23:14",
+        type: "Tutorial / Técnica",
+        title: "How to Muay Thai 101 | Complete Muay Thai Tutorial for Beginners — The Muay Thai Guy",
+        focus: "Tutorial detallado de posturas, guardia, desplazamiento y golpes base de Muay Thai para iniciar desde cero.",
+        url: "https://www.youtube.com/watch?v=640rsP_0WgY"
+      },
+      {
+        id: "v14",
+        num: 14,
+        duration: "32:09",
+        type: "Tutorial / Técnica",
+        title: "Muay Thai Training 101: Full Beginner's Class — fightTIPS",
+        focus: "Clase tutorial completa para principiantes enfocada en aprender la ejecución biomecánica de golpes y patadas.",
+        url: "https://www.youtube.com/watch?v=vXv6uvrUjKo"
+      },
+      {
+        id: "v15",
+        num: 15,
+        duration: "5:59",
+        type: "Tutorial / Técnica",
+        title: "How to Throw a Kick | Kickboxing Basics for Beginners — TITLE Boxing Club",
+        focus: "Guía rápida y directa sobre la mecánica de giro de cadera y posición del pie de apoyo para patear correctamente.",
+        url: "https://www.youtube.com/watch?v=3EmKRWWiUXY"
+      },
+      {
+        id: "v16",
+        num: 16,
+        duration: "7:15",
+        type: "Tutorial / Técnica",
+        title: "Aprender a lanzar PATADAS desde 0 en Muay Thai o KickBoxing — Eduardo Catalin (Español)",
+        focus: "Explicación paso a paso en español de rotación de pie de apoyo, cadera y patadas básicas.",
+        url: "https://www.youtube.com/watch?v=7ZOcUA5Gz24"
+      },
+      {
+        id: "v17",
+        num: 17,
+        duration: "8:44",
+        type: "Tutorial / Técnica",
+        title: "Guía de patadas en kickboxing — DEPORPRIVÉ (Español)",
+        focus: "Repaso en español de low kick, middle kick, high kick y patada frontal.",
+        url: "https://www.youtube.com/watch?v=xN0EVfgPbcU"
+      },
+      {
+        id: "v18",
+        num: 18,
+        duration: "16:59",
+        type: "Tutorial / Técnica",
+        title: "GOLPEAR con RODILLAS y CODOS: Aprende Rodillazos y Codazos — Emmanuel SaSán (Español)",
+        focus: "Tutorial en español para aprender rodillas y codos de Muay Thai sin perder el equilibrio.",
+        url: "https://www.youtube.com/watch?v=S7jedv6aHm8"
+      }
+    ];
+
+    const STORAGE_KEY = "saco_tracker_state_v1";
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return { progress: {}, customVideos: [] };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    let state = loadState();
+    let currentFilter = "all";
+    let searchTerm = "";
+
+    const listEl = document.getElementById("list");
+    const statsPill = document.getElementById("statsPill");
+    const progressFill = document.getElementById("progressFill");
+    const searchInput = document.getElementById("searchInput");
+    const addModal = document.getElementById("addModal");
+    const addForm = document.getElementById("addForm");
+
+    function getAllVideos() {
+      return [...INITIAL_VIDEOS, ...(state.customVideos || [])];
+    }
+
+    function getTypeBadgeClass(type) {
+      const t = type.toLowerCase();
+      if (t.includes("tutorial")) return "badge-tut";
+      if (t.includes("muay") && t.includes("kick")) return "badge-kick";
+      if (t.includes("muay")) return "badge-muay";
+      if (t.includes("kick")) return "badge-kick";
+      return "badge-boxeo";
+    }
+
+    function updateStats() {
+      const all = getAllVideos();
+      const doneCount = all.filter(v => state.progress[v.id]?.done).length;
+      const total = all.length;
+      statsPill.textContent = `${doneCount} / ${total} hechos`;
+      progressFill.style.width = total ? `${Math.round((doneCount / total) * 100)}%` : "0%";
+    }
+
+    function matchesFilter(v) {
+      const isDone = Boolean(state.progress[v.id]?.done);
+      if (currentFilter === "pending" && isDone) return false;
+      if (currentFilter === "done" && !isDone) return false;
+      if (currentFilter === "Boxeo" && !v.type.includes("Boxeo")) return false;
+      if (currentFilter === "Kickboxing" && !v.type.includes("Kick")) return false;
+      if (currentFilter === "Muay Thai" && !v.type.includes("Muay")) return false;
+      if (currentFilter === "Tutorial" && !v.type.includes("Tutorial")) return false;
+
+      if (searchTerm.trim()) {
+        const q = searchTerm.toLowerCase();
+        const note = (state.progress[v.id]?.note || "").toLowerCase();
+        const hay = `${v.title} ${v.type} ${v.duration} ${v.focus} ${note}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    }
+
+    function render() {
+      updateStats();
+      const videos = getAllVideos().filter(matchesFilter);
+
+      if (!videos.length) {
+        listEl.innerHTML = `<div class="empty-state">No hay videos que coincidan con este filtro.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = "";
+      videos.forEach((v, idx) => {
+        const prog = state.progress[v.id] || { done: false, note: "" };
+        const card = document.createElement("article");
+        card.className = `card${prog.done ? " done" : ""}`;
+
+        const ytHref = v.url
+          ? v.url
+          : `https://www.youtube.com/results?search_query=${encodeURIComponent(v.searchQuery || v.title)}`;
+        const ytLabel = v.url ? "▶ Abrir en YouTube" : "🔍 Buscar en YouTube";
+        const ytClass = v.url ? "yt-btn" : "yt-btn search-mode";
+
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="badges">
+              <span class="badge badge-num">#${v.num || idx + 1}</span>
+              <span class="badge badge-dur">⏱ ${v.duration}</span>
+              <span class="badge ${getTypeBadgeClass(v.type)}">${v.type}</span>
+            </div>
+            <button type="button" class="check-btn ${prog.done ? "checked" : ""}" data-id="${v.id}">
+              ${prog.done ? "✓ Hecho" : "○ Pendiente"}
+            </button>
+          </div>
+          <h2 class="card-title">${escapeHtml(v.title)}</h2>
+          ${v.focus ? `<p class="card-focus"><strong>Enfoque:</strong> ${escapeHtml(v.focus)}</p>` : ""}
+          <div class="actions">
+            <a class="${ytClass}" href="${ytHref}" target="_blank" rel="noopener noreferrer">${ytLabel}</a>
+            ${v.custom ? `<button type="button" class="del-custom-btn" data-del="${v.id}" title="Eliminar video agregado">🗑</button>` : ""}
+          </div>
+          <div class="note-box">
+            <div class="note-header">
+              <span>📝 Mis observaciones</span>
+              <span class="note-saved" id="saved-${v.id}">Guardado ✓</span>
+            </div>
+            <textarea class="note-input" data-note="${v.id}" placeholder="Anota qué tal te fue, rounds completados, qué corregir...">${escapeHtml(prog.note || "")}</textarea>
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    listEl.addEventListener("click", (e) => {
+      const checkBtn = e.target.closest(".check-btn");
+      if (checkBtn) {
+        const id = checkBtn.dataset.id;
+        const prev = state.progress[id] || { done: false, note: "" };
+        state.progress[id] = { ...prev, done: !prev.done };
+        saveState();
+        render();
+        return;
+      }
+
+      const delBtn = e.target.closest(".del-custom-btn");
+      if (delBtn) {
+        const id = delBtn.dataset.del;
+        state.customVideos = (state.customVideos || []).filter(v => v.id !== id);
+        delete state.progress[id];
+        saveState();
+        render();
+      }
+    });
+
+    let noteTimers = {};
+    listEl.addEventListener("input", (e) => {
+      const ta = e.target.closest("textarea.note-input");
+      if (!ta) return;
+      const id = ta.dataset.note;
+      const prev = state.progress[id] || { done: false, note: "" };
+      state.progress[id] = { ...prev, note: ta.value };
+      saveState();
+
+      const badge = document.getElementById(`saved-${id}`);
+      if (badge) {
+        badge.classList.add("show");
+        clearTimeout(noteTimers[id]);
+        noteTimers[id] = setTimeout(() => badge.classList.remove("show"), 1200);
+      }
+    });
+
+    document.getElementById("filters").addEventListener("click", (e) => {
+      const btn = e.target.closest(".filter-btn");
+      if (!btn) return;
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = btn.dataset.filter;
+      render();
+    });
+
+    searchInput.addEventListener("input", (e) => {
+      searchTerm = e.target.value;
+      render();
+    });
+
+    document.getElementById("resetChecksBtn").addEventListener("click", () => {
+      if (!confirm("¿Desmarcar todos los checks de 'Hecho'? (Tus observaciones se mantienen)")) return;
+      Object.keys(state.progress).forEach(id => {
+        if (state.progress[id]) state.progress[id].done = false;
+      });
+      saveState();
+      render();
+    });
+
+    document.getElementById("addBtn").addEventListener("click", () => {
+      addForm.reset();
+      addModal.showModal();
+    });
+
+    document.getElementById("cancelModal").addEventListener("click", () => {
+      addModal.close();
+    });
+
+    addForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const all = getAllVideos();
+      const newVideo = {
+        id: "c_" + Date.now(),
+        num: all.length + 1,
+        title: document.getElementById("fTitle").value.trim(),
+        type: document.getElementById("fType").value,
+        duration: document.getElementById("fDur").value.trim(),
+        url: document.getElementById("fUrl").value.trim(),
+        focus: document.getElementById("fDesc").value.trim(),
+        custom: true
+      };
+      state.customVideos = state.customVideos || [];
+      state.customVideos.push(newVideo);
+      saveState();
+      addModal.close();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
