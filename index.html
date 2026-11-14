@@ -322,6 +322,58 @@
     }
     .note-saved.show { opacity: 1; }
 
+    .rating-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .rating-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .stars {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .star-btn {
+      background: none;
+      border: none;
+      padding: 2px 4px;
+      font-size: 1.25rem;
+      line-height: 1;
+      color: #374151;
+      cursor: pointer;
+      transition: transform 0.1s ease, color 0.15s ease;
+    }
+
+    .star-btn.filled {
+      color: #f59e0b;
+    }
+
+    .star-btn:active {
+      transform: scale(1.2);
+    }
+
+    .rating-clear {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.78rem;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+
     textarea.note-input {
       width: 100%;
       min-height: 58px;
@@ -649,26 +701,8 @@
         url: "https://www.youtube.com/watch?v=7ZOcUA5Gz24"
       },
       {
-        id: "v17",
-        num: 17,
-        duration: "8:44",
-        type: "Tutorial / Técnica",
-        title: "Guía de patadas en kickboxing — DEPORPRIVÉ (Español)",
-        focus: "Repaso en español de low kick, middle kick, high kick y patada frontal.",
-        url: "https://www.youtube.com/watch?v=xN0EVfgPbcU"
-      },
-      {
-        id: "v18",
-        num: 18,
-        duration: "16:59",
-        type: "Tutorial / Técnica",
-        title: "GOLPEAR con RODILLAS y CODOS: Aprende Rodillazos y Codazos — Emmanuel SaSán (Español)",
-        focus: "Tutorial en español para aprender rodillas y codos de Muay Thai sin perder el equilibrio.",
-        url: "https://www.youtube.com/watch?v=S7jedv6aHm8"
-      },
-      {
         id: "p1",
-        num: 19,
+        num: 17,
         main: true,
         duration: "3:01",
         type: "Patadas",
@@ -754,7 +788,7 @@
       },
       {
         id: "rc2",
-        num: 27,
+        num: 26,
         duration: "2:00",
         type: "Rodillas y Codos",
         title: "2. Rodilla diagonal — Muay Thai Diagonal Knee (Christoph Delp)",
@@ -762,29 +796,20 @@
         url: "https://www.youtube.com/watch?v=iGlyEbd54D4"
       },
       {
-        id: "rc3",
-        num: 28,
-        duration: "7:28",
-        type: "Rodillas y Codos",
-        title: "3. Rodilla lateral en clinch — How To Throw Side Knees From The Clinch (Gabriel Varga)",
-        focus: "Rodillazos laterales en distancia muy corta y cómo generar potencia sin perder el equilibrio.",
-        url: "https://www.youtube.com/watch?v=RCxsnM0g-Xg"
-      },
-      {
         id: "rc4",
-        num: 29,
+        num: 27,
         duration: "1:26",
         type: "Rodillas y Codos",
-        title: "4. Codo horizontal — How to Throw a Left Cross Elbow | YOKKAO",
+        title: "3. Codo horizontal — How to Throw a Left Cross Elbow | YOKKAO",
         focus: "Codazo horizontal (Sok Tad): mecánica similar a un hook corto, rotando cadera y hombro con la otra mano pegada al mentón.",
         url: "https://www.youtube.com/watch?v=X04FV9c8r5E"
       },
       {
         id: "rc5",
-        num: 30,
+        num: 28,
         duration: "1:33",
         type: "Rodillas y Codos",
-        title: "5. Codo ascendente (Uppercut) — How to Throw a Left Uppercut Elbow | YOKKAO",
+        title: "4. Codo ascendente (Uppercut) — How to Throw a Left Uppercut Elbow | YOKKAO",
         focus: "Codazo ascendente (Sok Ngad) para cortar por el centro de la guardia en distancia corta.",
         url: "https://www.youtube.com/watch?v=nYaXSiUKqjg"
       }
@@ -869,7 +894,11 @@
 
       listEl.innerHTML = "";
       videos.forEach((v, idx) => {
-        const prog = state.progress[v.id] || { done: false, note: "" };
+        const prog = state.progress[v.id] || { done: false, note: "", rating: 0 };
+        const rating = Number(prog.rating || 0);
+        const starsHtml = [1, 2, 3, 4, 5].map(n =>
+          `<button type="button" class="star-btn ${n <= rating ? "filled" : ""}" data-rate-id="${v.id}" data-star="${n}" aria-label="${n} estrellas">★</button>`
+        ).join("");
         const card = document.createElement("article");
         card.className = `card${prog.done ? " done" : ""}${v.main ? " is-main" : ""}`;
 
@@ -897,6 +926,13 @@
             <a class="${ytClass}" href="${ytHref}" target="_blank" rel="noopener noreferrer">${ytLabel}</a>
             ${v.custom ? `<button type="button" class="del-custom-btn" data-del="${v.id}" title="Eliminar video agregado">🗑</button>` : ""}
           </div>
+          <div class="rating-row">
+            <span class="rating-label">Calificación ${rating ? `(${rating}/5)` : ""}</span>
+            <div class="stars">
+              ${starsHtml}
+              ${rating ? `<button type="button" class="rating-clear" data-rate-clear="${v.id}" title="Quitar calificación">✕</button>` : ""}
+            </div>
+          </div>
           <div class="note-box">
             <div class="note-header">
               <span>📝 Mis observaciones</span>
@@ -923,6 +959,28 @@
         const id = checkBtn.dataset.id;
         const prev = state.progress[id] || { done: false, note: "" };
         state.progress[id] = { ...prev, done: !prev.done };
+        saveState();
+        render();
+        return;
+      }
+
+      const starBtn = e.target.closest(".star-btn");
+      if (starBtn) {
+        const id = starBtn.dataset.rateId;
+        const star = Number(starBtn.dataset.star);
+        const prev = state.progress[id] || { done: false, note: "", rating: 0 };
+        const nextRating = prev.rating === star ? 0 : star;
+        state.progress[id] = { ...prev, rating: nextRating };
+        saveState();
+        render();
+        return;
+      }
+
+      const clearRateBtn = e.target.closest(".rating-clear");
+      if (clearRateBtn) {
+        const id = clearRateBtn.dataset.rateClear;
+        const prev = state.progress[id] || { done: false, note: "", rating: 0 };
+        state.progress[id] = { ...prev, rating: 0 };
         saveState();
         render();
         return;
