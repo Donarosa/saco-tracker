@@ -212,6 +212,7 @@
     .badge-kick { background: rgba(245, 158, 11, 0.16); color: #fcd34d; }
     .badge-muay { background: rgba(168, 85, 247, 0.16); color: #d8b4fe; }
     .badge-tut { background: rgba(34, 197, 94, 0.16); color: #86efac; }
+    .badge-patada { background: rgba(6, 182, 212, 0.16); color: #67e8f9; }
 
     .check-btn {
       display: inline-flex;
@@ -441,6 +442,7 @@
       <button class="filter-btn" data-filter="Boxeo">Boxeo</button>
       <button class="filter-btn" data-filter="Kickboxing">Kickboxing</button>
       <button class="filter-btn" data-filter="Muay Thai">Muay Thai</button>
+      <button class="filter-btn" data-filter="Patadas">🦵 Patadas</button>
       <button class="filter-btn" data-filter="Tutorial">Tutoriales</button>
     </div>
   </header>
@@ -467,6 +469,7 @@
           <option value="Boxeo (Saco)">Boxeo (Saco)</option>
           <option value="Kickboxing (Saco)">Kickboxing (Saco)</option>
           <option value="Muay Thai (Saco)">Muay Thai (Saco)</option>
+          <option value="Patadas">Patadas</option>
           <option value="Tutorial / Técnica">Tutorial / Técnica</option>
         </select>
       </div>
@@ -654,6 +657,51 @@
         title: "GOLPEAR con RODILLAS y CODOS: Aprende Rodillazos y Codazos — Emmanuel SaSán (Español)",
         focus: "Tutorial en español para aprender rodillas y codos de Muay Thai sin perder el equilibrio.",
         url: "https://www.youtube.com/watch?v=S7jedv6aHm8"
+      },
+      {
+        id: "p1",
+        num: 19,
+        duration: "3:01",
+        type: "Patadas",
+        title: "1. Front Kick / Teep — How to Throw a Muay Thai Teep (Front and Rear)",
+        focus: "Patada frontal de empuje: levanta la rodilla, empuja con la cadera y golpea con la bola del pie para frenar o mantener distancia.",
+        url: "https://www.youtube.com/watch?v=5wBQs-l7yss"
+      },
+      {
+        id: "p2",
+        num: 20,
+        duration: "3:00",
+        type: "Patadas",
+        title: "2. Low Kick — How To Throw a Muay Thai Low Kick (The Muay Thai Guy)",
+        focus: "Patada circular baja al muslo: paso en 45°, giro del pie de apoyo, rotación de cadera y golpe con la tibia.",
+        url: "https://www.youtube.com/watch?v=mXb5Nolg30Y"
+      },
+      {
+        id: "p3",
+        num: 21,
+        duration: "4:55",
+        type: "Patadas",
+        title: "3. Middle / Body Kick — How to Throw the Perfect Muay Thai Body Kick",
+        focus: "Patada circular media a las costillas: balanceo del brazo para generar torque, pivote completo y choque con la tibia.",
+        url: "https://www.youtube.com/watch?v=ToKGd5NrXDg"
+      },
+      {
+        id: "p4",
+        num: 22,
+        duration: "1:29",
+        type: "Patadas",
+        title: "4. High Kick — How to Throw a Left High Kick | YOKKAO",
+        focus: "Patada circular alta a la cabeza: elevación diagonal de rodilla, giro de cadera hacia arriba y guardia firme.",
+        url: "https://www.youtube.com/watch?v=lKH3ypAvpHk"
+      },
+      {
+        id: "p5",
+        num: 23,
+        duration: "1:55",
+        type: "Patadas",
+        title: "5. Side Kick — How to Do a Sidekick | Kickboxing Lessons",
+        focus: "Patada lateral (Kickboxing): giro de costado, rodilla al pecho y empuje recto con el talón/borde externo del pie.",
+        url: "https://www.youtube.com/watch?v=JMCDrA8sli8"
       }
     ];
 
@@ -688,6 +736,7 @@
 
     function getTypeBadgeClass(type) {
       const t = type.toLowerCase();
+      if (t.includes("patada")) return "badge-patada";
       if (t.includes("tutorial")) return "badge-tut";
       if (t.includes("muay") && t.includes("kick")) return "badge-kick";
       if (t.includes("muay")) return "badge-muay";
@@ -710,6 +759,7 @@
       if (currentFilter === "Boxeo" && !v.type.includes("Boxeo")) return false;
       if (currentFilter === "Kickboxing" && !v.type.includes("Kick")) return false;
       if (currentFilter === "Muay Thai" && !v.type.includes("Muay")) return false;
+      if (currentFilter === "Patadas" && !v.type.includes("Patada")) return false;
       if (currentFilter === "Tutorial" && !v.type.includes("Tutorial")) return false;
 
       if (searchTerm.trim()) {
