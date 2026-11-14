@@ -214,6 +214,11 @@
     .badge-tut { background: rgba(34, 197, 94, 0.16); color: #86efac; }
     .badge-patada { background: rgba(6, 182, 212, 0.16); color: #67e8f9; }
     .badge-rc { background: rgba(244, 63, 94, 0.16); color: #fda4af; }
+    .badge-main { background: rgba(245, 158, 11, 0.22); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.45); }
+
+    .card.is-main {
+      border-left: 3px solid var(--amber);
+    }
 
     .check-btn {
       display: inline-flex;
@@ -664,37 +669,41 @@
       {
         id: "p1",
         num: 19,
+        main: true,
         duration: "3:01",
         type: "Patadas",
-        title: "1. Front Kick / Teep — How to Throw a Muay Thai Teep (Front and Rear)",
-        focus: "Patada frontal de empuje: levanta la rodilla, empuja con la cadera y golpea con la bola del pie para frenar o mantener distancia.",
+        title: "1. Front Kick (Teep) — How to Throw a Muay Thai Teep (Front and Rear)",
+        focus: "Patada frontal de empuje (el 'jab' de las piernas): levanta la rodilla, empuja con la cadera y golpea con la bola del pie para frenar o mantener distancia.",
         url: "https://www.youtube.com/watch?v=5wBQs-l7yss"
       },
       {
         id: "p2",
         num: 20,
+        main: true,
         duration: "3:00",
         type: "Patadas",
-        title: "2. Low Kick — How To Throw a Muay Thai Low Kick (The Muay Thai Guy)",
-        focus: "Patada circular baja al muslo: paso en 45°, giro del pie de apoyo, rotación de cadera y golpe con la tibia.",
+        title: "2. Low Kick (y su versión más baja, Calf Kick) — How To Throw a Muay Thai Low Kick",
+        focus: "Patada circular baja al muslo (o más abajo a la pantorrilla en el Calf Kick): paso en 45°, giro del pie de apoyo, rotación de cadera y golpe con la tibia.",
         url: "https://www.youtube.com/watch?v=mXb5Nolg30Y"
       },
       {
         id: "p3",
         num: 21,
+        main: true,
         duration: "4:55",
         type: "Patadas",
-        title: "3. Middle / Body Kick — How to Throw the Perfect Muay Thai Body Kick",
-        focus: "Patada circular media a las costillas: balanceo del brazo para generar torque, pivote completo y choque con la tibia.",
+        title: "3. Middle Kick (con pierna trasera y Switch Kick) — Perfect Muay Thai Body Kick",
+        focus: "Patada circular media a las costillas (directa con pierna trasera, o con un saltito rápido / Switch Kick para pegar fuerte con la adelantada).",
         url: "https://www.youtube.com/watch?v=ToKGd5NrXDg"
       },
       {
         id: "p4",
         num: 22,
+        main: true,
         duration: "1:29",
         type: "Patadas",
         title: "4. High Kick — How to Throw a Left High Kick | YOKKAO",
-        focus: "Patada circular alta a la cabeza: elevación diagonal de rodilla, giro de cadera hacia arriba y guardia firme.",
+        focus: "Patada circular alta a la cabeza: elevación diagonal de rodilla, giro completo de cadera hacia arriba y guardia firme.",
         url: "https://www.youtube.com/watch?v=lKH3ypAvpHk"
       },
       {
@@ -852,7 +861,7 @@
       videos.forEach((v, idx) => {
         const prog = state.progress[v.id] || { done: false, note: "" };
         const card = document.createElement("article");
-        card.className = `card${prog.done ? " done" : ""}`;
+        card.className = `card${prog.done ? " done" : ""}${v.main ? " is-main" : ""}`;
 
         const ytHref = v.url
           ? v.url
@@ -866,6 +875,7 @@
               <span class="badge badge-num">#${v.num || idx + 1}</span>
               <span class="badge badge-dur">⏱ ${v.duration}</span>
               <span class="badge ${getTypeBadgeClass(v.type)}">${v.type}</span>
+              ${v.main ? `<span class="badge badge-main">⭐ PRINCIPAL</span>` : ""}
             </div>
             <button type="button" class="check-btn ${prog.done ? "checked" : ""}" data-id="${v.id}">
               ${prog.done ? "✓ Hecho" : "○ Pendiente"}
