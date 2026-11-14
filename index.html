@@ -213,6 +213,7 @@
     .badge-muay { background: rgba(168, 85, 247, 0.16); color: #d8b4fe; }
     .badge-tut { background: rgba(34, 197, 94, 0.16); color: #86efac; }
     .badge-patada { background: rgba(6, 182, 212, 0.16); color: #67e8f9; }
+    .badge-rc { background: rgba(244, 63, 94, 0.16); color: #fda4af; }
 
     .check-btn {
       display: inline-flex;
@@ -443,6 +444,7 @@
       <button class="filter-btn" data-filter="Kickboxing">Kickboxing</button>
       <button class="filter-btn" data-filter="Muay Thai">Muay Thai</button>
       <button class="filter-btn" data-filter="Patadas">🦵 Patadas</button>
+      <button class="filter-btn" data-filter="Rodillas y Codos">💪 Rodillas y Codos</button>
       <button class="filter-btn" data-filter="Tutorial">Tutoriales</button>
     </div>
   </header>
@@ -470,6 +472,7 @@
           <option value="Kickboxing (Saco)">Kickboxing (Saco)</option>
           <option value="Muay Thai (Saco)">Muay Thai (Saco)</option>
           <option value="Patadas">Patadas</option>
+          <option value="Rodillas y Codos">Rodillas y Codos</option>
           <option value="Tutorial / Técnica">Tutorial / Técnica</option>
         </select>
       </div>
@@ -720,6 +723,51 @@
         title: "7. Roundhouse Kick (Low/Mid/High) — How to Do a Roundhouse Kick | Kickboxing Lessons (Howcast)",
         focus: "Misma serie que Side Kick: mecánica completa de patada circular (pivote, giro de cadera y extensión) aplicable a baja, media y alta.",
         url: "https://www.youtube.com/watch?v=R0WcFxtKFj8"
+      },
+      {
+        id: "rc1",
+        num: 26,
+        duration: "3:36",
+        type: "Rodillas y Codos",
+        title: "1. Rodilla recta — How to Do a Knee Strike | Kickboxing Lessons (Howcast)",
+        focus: "Rodillazo básico recto al cuerpo/saco: impulso de cadera hacia adelante, punta del pie hacia abajo y manos firmes.",
+        url: "https://www.youtube.com/watch?v=sERtk-89xmI"
+      },
+      {
+        id: "rc2",
+        num: 27,
+        duration: "2:00",
+        type: "Rodillas y Codos",
+        title: "2. Rodilla diagonal — Muay Thai Diagonal Knee (Christoph Delp)",
+        focus: "Rodillazo en ángulo de 45° (Khao Chiang) girando la cadera para entrar por el costado de la guardia hacia las costillas.",
+        url: "https://www.youtube.com/watch?v=iGlyEbd54D4"
+      },
+      {
+        id: "rc3",
+        num: 28,
+        duration: "7:28",
+        type: "Rodillas y Codos",
+        title: "3. Rodilla lateral en clinch — How To Throw Side Knees From The Clinch (Gabriel Varga)",
+        focus: "Rodillazos laterales en distancia muy corta y cómo generar potencia sin perder el equilibrio.",
+        url: "https://www.youtube.com/watch?v=RCxsnM0g-Xg"
+      },
+      {
+        id: "rc4",
+        num: 29,
+        duration: "1:26",
+        type: "Rodillas y Codos",
+        title: "4. Codo horizontal — How to Throw a Left Cross Elbow | YOKKAO",
+        focus: "Codazo horizontal (Sok Tad): mecánica similar a un hook corto, rotando cadera y hombro con la otra mano pegada al mentón.",
+        url: "https://www.youtube.com/watch?v=X04FV9c8r5E"
+      },
+      {
+        id: "rc5",
+        num: 30,
+        duration: "1:33",
+        type: "Rodillas y Codos",
+        title: "5. Codo ascendente (Uppercut) — How to Throw a Left Uppercut Elbow | YOKKAO",
+        focus: "Codazo ascendente (Sok Ngad) para cortar por el centro de la guardia en distancia corta.",
+        url: "https://www.youtube.com/watch?v=nYaXSiUKqjg"
       }
     ];
 
@@ -754,6 +802,7 @@
 
     function getTypeBadgeClass(type) {
       const t = type.toLowerCase();
+      if (t.includes("rodilla") || t.includes("codo")) return "badge-rc";
       if (t.includes("patada")) return "badge-patada";
       if (t.includes("tutorial")) return "badge-tut";
       if (t.includes("muay") && t.includes("kick")) return "badge-kick";
@@ -778,6 +827,7 @@
       if (currentFilter === "Kickboxing" && !v.type.includes("Kick")) return false;
       if (currentFilter === "Muay Thai" && !v.type.includes("Muay")) return false;
       if (currentFilter === "Patadas" && !v.type.includes("Patada")) return false;
+      if (currentFilter === "Rodillas y Codos" && !v.type.includes("Rodillas")) return false;
       if (currentFilter === "Tutorial" && !v.type.includes("Tutorial")) return false;
 
       if (searchTerm.trim()) {
